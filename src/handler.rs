@@ -19,9 +19,9 @@ async fn test_handler() -> impl Responder {
 #[get("/todos")]
 pub async fn todos_list_handler(
     opts: web::Query<QueryOptions>,
-    data: web::Data<AppState>,
+    database: web::Data<AppState>,
 ) -> impl Responder {
-    let todos = data.todo_db.lock().unwrap();
+    let todos = database.todo_db.lock().unwrap();
 
     let limit = opts.limit.unwrap_or(10);
     let offset = (opts.page.unwrap_or(1) - 1) * limit;
@@ -31,7 +31,7 @@ pub async fn todos_list_handler(
     let json_response = TodoListResponse {
         status: "success".to_string(),
         results: todos.len(),
-        todos,
+        data: todos,
     };
     HttpResponse::Ok().json(json_response)
 }
